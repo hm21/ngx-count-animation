@@ -1,27 +1,129 @@
-# NgxCountAnimation
+<h1>ngx-count-animation</h1>
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.0.0.
+<div>
 
-## Development server
+[![npm version](https://badge.fury.io/js/ngx-count-animations.svg)](https://badge.fury.io/js/ngx-count-animations)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Twitter Follow](https://img.shields.io/twitter/follow/hm21.svg)](https://twitter.com/Frei2100)
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+</div>
 
-## Code scaffolding
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Table of contents
 
-## Build
+- [About](#about)
+- [Getting started](#getting-started)
+- [Documentation](#documentation)
+- [Example](#example)
+- [Contributing](#contributing)
+- [License](LICENSE)
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
-## Running unit tests
+<h2>About</h2>
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+An package that elegantly animates number changes, creating a visually engaging transition from one value to another, perfect for counting or displaying real-time data updates.
 
-## Running end-to-end tests
+<h2>Getting started</h2>
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+### Installation
 
-## Further help
+```sh
+npm install ngx-count-animation
+```
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+### Using the directive
+
+#### Standalone component
+```typescript
+import { Component } from '@angular/core';
+import { NgxCountAnimationDirective } from 'ngx-count-animation';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.scss',
+  imports: [ NgxCountAnimationDirective ],
+})
+export class AppComponent {}
+```
+
+#### Or for Module
+```typescript
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { AppComponent } from './app.component';
+
+import { NgxCountAnimationDirective } from 'ngx-count-animation';
+
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    NgxCountAnimationDirective,
+  ],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+
+<h2>Documentation</h2>
+
+### Inputs
+
+| Option                   | Type    | Default | Comment                                                                                              |
+| :----------------------- | :------ | :------ | :--------------------------------------------------------------------------------------------------- |
+| ngxCountAnimation        | number  |         | Sets the target count for the count animation.                                                       |
+| maximumFractionDigits    | number  | 0       | The maximum number of fraction digits to display.                                                    |
+| minimumFractionDigits    | number  | 0       | The minimum number of fraction digits to display.                                                    |
+| duration                 | number  | 2000    | Sets the duration of the count animation.                                                            |
+| durationFromValue        | number  |         | Sets the duration based on the given value.                                                          |
+| highPerformance          | boolean | true    | When `highPerformance` is `false`, an interval listener is active to detect layout changes.          |
+
+
+### Outputs
+| Option          | Type               | Comment                                       |
+|:----------------|:-------------------|:----------------------------------------------|
+| startAnimation  | EventEmitter<void> | Emits an event at the start of the animation. |
+| endAnimation    | EventEmitter<void> | Emits an event at the end of the animation.   |
+
+
+<h2>Example</h2>
+
+#### Simple example
+```html
+<div ngxCountAnimation="1000000"></div>
+```
+
+#### Complete example demonstrating all properties
+```html
+ <div
+      ngxCountAnimation="123456789"
+      duration="2000"
+      maximumFractionDigits="0"
+      minimumFractionDigits="0"
+      highPerformance="true"
+    ></div>
+```
+
+## Contributing
+
+I welcome contributions from the open-source community to make this project even better. Whether you want to report a bug, suggest a new feature, or contribute code, I appreciate your help.
+
+### Bug Reports and Feature Requests
+
+If you encounter a bug or have an idea for a new feature, please open an issue on my [GitHub Issues](https://github.com/hm21/ngx-count-animation/issues) page. I will review it and discuss the best approach to address it.
+
+### Code Contributions
+
+If you'd like to contribute code to this project, please follow these steps:
+
+1. Fork the repository to your GitHub account.
+2. Clone your forked repository to your local machine.
+
+```bash
+git clone https://github.com/hm21/ngx-scroll-animations.git
+```
