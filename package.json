@@ -1,6 +1,6 @@
 {
   "name": "ngx-count-animation",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A package that elegantly animates number changes, creating a visually engaging transition from one value to another, perfect for counting or displaying real-time data updates.",
   "author": {
     "name": "Alex Frei",
@@ -26,7 +26,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "npm:publish": "cd dist/ngx-count-animation & npm publish",
+    "npm:publish": "npm run build & cd dist/ngx-count-animation & npm publish",
     "build": "ng build ngx-count-animation & npm run build:copyfiles",
     "build:copyfiles": "copyfiles CHANGELOG.md README.md LICENSE dist/ngx-count-animation",
     "build:styles": "sass --style compressed dist/ngx-count-animation/styles/animations.scss dist/ngx-count-animation/styles/animations.min.scss & sass dist/ngx-count-animation/styles/animations.scss dist/ngx-count-animation/styles/animations.css & sass --style compressed dist/ngx-count-animation/styles/animations.scss dist/ngx-count-animation/styles/animations.min.css",

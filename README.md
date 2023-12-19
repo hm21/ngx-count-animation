@@ -8,6 +8,10 @@
 
 </div>
 
+<h2 >Demo</h2>
+<div>
+https://ngx-hm21.web.app/count-animation
+</div>
 
 ## Table of contents
 

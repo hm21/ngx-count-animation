@@ -120,6 +120,7 @@ export class NgxCountAnimationDirective implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.elRef.nativeElement.classList.add('ngx-count-animation');
     if (!isPlatformBrowser(this.platformId)) return;
     this.initializeCountAnimation();
   }
@@ -128,7 +129,6 @@ export class NgxCountAnimationDirective implements OnInit {
    * Initializes the count animation if the element is in the viewport.
    */
   private initializeCountAnimation(): void {
-    this.elRef.nativeElement.classList.add('ngx-count-animation');
     this.renderer.setProperty(this.elRef.nativeElement, 'innerHTML', 0);
     this.zone.runOutsideAngular(() => {
       if (this.checkIsInViewport) {
