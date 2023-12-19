@@ -21,7 +21,7 @@
 
 <h2>About</h2>
 
-An package that elegantly animates number changes, creating a visually engaging transition from one value to another, perfect for counting or displaying real-time data updates.
+A package that elegantly animates number changes, creating a visually engaging transition from one value to another, perfect for counting or displaying real-time data updates.
 
 <h2>Getting started</h2>
 
