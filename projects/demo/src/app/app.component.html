@@ -1,0 +1,24 @@
+<section style="min-height: 100vh">
+  @for (example of examples; track $index) {
+  <div class="title" [innerText]="example.title"></div>
+  @if(example.subtitle){
+  <div class="subtitle" [innerText]="example.subtitle"></div>
+  }
+  <div class="row">
+    <div
+      #ref
+      [ngxCountAnimation]="example.value"
+      [duration]="example.duration ?? 2000"
+      [maximumFractionDigits]="example.maximumFractionDigits ?? 0"
+      [minimumFractionDigits]="example.minimumFractionDigits ?? 0"
+      [highPerformance]="example.highPerformance"
+    ></div>
+    <button class="random-btn" (click)="toggleValue(example)">Random</button>
+  </div>
+  }
+</section>
+
+<section>
+  <div class="title">Trigger when scrolling in viewport</div>
+  <div #ref [ngxCountAnimation]="1000000"></div>
+</section>

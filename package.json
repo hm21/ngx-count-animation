@@ -1,14 +1,40 @@
 {
   "name": "ngx-count-animation",
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "An application that elegantly animates number changes, creating a visually engaging transition from one value to another, perfect for counting or displaying real-time data updates.",
+  "author": {
+    "name": "Alex Frei",
+    "email": "alex.frei@waio.ch",
+    "url": "https://waio.ch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hm21/ngx-count-animation.git"
+  },
+  "keywords": [
+    "angular",
+    "angular2",
+    "count",
+    "animation"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hm21/ngx-count-animation/issues"
+  },
+  "homepage": "https://github.com/hm21/ngx-count-animation#readme",
+  "contributors": [],
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "npm:publish": "cd dist/ngx-count-animation & npm publish",
+    "build": "ng build ngx-count-animation & npm run build:copyfiles",
+    "build:copyfiles": "copyfiles CHANGELOG.md README.md LICENSE dist/ngx-count-animation",
+    "build:styles": "sass --style compressed dist/ngx-count-animation/styles/animations.scss dist/ngx-count-animation/styles/animations.min.scss & sass dist/ngx-count-animation/styles/animations.scss dist/ngx-count-animation/styles/animations.css & sass --style compressed dist/ngx-count-animation/styles/animations.scss dist/ngx-count-animation/styles/animations.min.css",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "serve:ssr:demo": "node dist/demo/server/server.mjs"
   },
-  "private": true,
+  "private": false,
   "dependencies": {
     "@angular/animations": "^17.0.0",
     "@angular/common": "^17.0.0",
@@ -17,21 +43,29 @@
     "@angular/forms": "^17.0.0",
     "@angular/platform-browser": "^17.0.0",
     "@angular/platform-browser-dynamic": "^17.0.0",
+    "@angular/platform-server": "^17.0.0",
     "@angular/router": "^17.0.0",
+    "@angular/ssr": "^17.0.7",
+    "express": "^4.18.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.2"
   },
   "devDependencies": {
+    "@angular-devkit/build-angular": "^17.0.7",
     "@angular/cli": "^17.0.0",
     "@angular/compiler-cli": "^17.0.0",
+    "@types/express": "^4.17.17",
     "@types/jasmine": "~5.1.0",
+    "@types/node": "^18.18.0",
     "jasmine-core": "~5.1.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "ng-packagr": "^17.0.0",
+    "copyfiles": "^2.4.1",
     "typescript": "~5.2.2"
   }
 }

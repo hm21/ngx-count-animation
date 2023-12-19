@@ -1,0 +1,34 @@
+{
+  "name": "ngx-count-animation",
+  "version": "1.0.0",
+  "description": "An application that elegantly animates number changes, creating a visually engaging transition from one value to another, perfect for counting or displaying real-time data updates.",
+  "author": {
+    "name": "Alex Frei",
+    "email": "alex.frei@waio.ch",
+    "url": "https://waio.ch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hm21/ngx-count-animation.git"
+  },
+  "keywords": [
+    "angular",
+    "angular2",
+    "count",
+    "animation"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hm21/ngx-count-animation/issues"
+  },
+  "homepage": "https://github.com/hm21/ngx-count-animation#readme",
+  "contributors": [],
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "peerDependencies": {
+    "@angular/common": ">=17.0.0",
+    "@angular/core": ">=17.0.0"
+  },
+  "sideEffects": false
+}
