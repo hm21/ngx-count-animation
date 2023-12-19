@@ -1,5 +1,5 @@
 import { isPlatformBrowser } from '@angular/common';
-import { DestroyRef, Directive, ElementRef, Inject, Input, NgZone, OnInit, PLATFORM_ID, Renderer2, booleanAttribute, inject, numberAttribute } from '@angular/core';
+import { DestroyRef, Directive, ElementRef, EventEmitter, Inject, Input, NgZone, OnInit, Output, PLATFORM_ID, Renderer2, booleanAttribute, inject, numberAttribute } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   BehaviorSubject,
@@ -19,20 +19,30 @@ import {
   takeWhile,
   timer
 } from 'rxjs';
-import { NgxCountUpService } from './ngx-count-animation.service';
+import { NgxCountService } from './ngx-count-animation.service';
 
 
 const easeOutQuad = (x: number): number => x * (2 - x);
 
 
 /**
- * Directive to animate counting up to a number.
+ * Directive to animate counting to a number.
  */
 @Directive({
   selector: '[ngxCountAnimation]',
   standalone: true,
 })
 export class NgxCountAnimationDirective implements OnInit {
+  /**
+   * Emits an event at the start of the animation.
+   */
+  @Output() startAnimation = new EventEmitter<void>();
+
+  /**
+   * Emits an event at the end of the animation.
+   */
+  @Output() endAnimation = new EventEmitter<void>();
+
   /** 
    * Without an active highPerformance mode, there is always an interval listener active that detects layout changes.
    * @type {boolean}
@@ -54,8 +64,8 @@ export class NgxCountAnimationDirective implements OnInit {
 
 
   /**
-   * Sets the target count for the count-up animation.
-   * @param count The target number to count up to.
+   * Sets the target count for the count animation.
+   * @param count The target number to count to.
    */
   @Input({ alias: 'ngxCountAnimation', transform: numberAttribute })
   set count(count: number) {
@@ -65,7 +75,7 @@ export class NgxCountAnimationDirective implements OnInit {
   }
 
   /**
-   * Sets the duration of the count-up animation.
+   * Sets the duration of the count animation.
    * @param duration Duration of the animation in milliseconds.
    * @default 2_000
    */
@@ -101,7 +111,7 @@ export class NgxCountAnimationDirective implements OnInit {
 
   private zone = inject(NgZone);
   private destroyRef = inject(DestroyRef);
-  private countUpService = inject(NgxCountUpService);
+  private countService = inject(NgxCountService);
   private readonly elRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly renderer = inject(Renderer2);
 
@@ -111,13 +121,13 @@ export class NgxCountAnimationDirective implements OnInit {
 
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;
-    this.initializeCountUp();
+    this.initializeCountAnimation();
   }
 
   /**
-   * Initializes the count-up animation if the element is in the viewport.
+   * Initializes the count animation if the element is in the viewport.
    */
-  private initializeCountUp(): void {
+  private initializeCountAnimation(): void {
     this.elRef.nativeElement.classList.add('ngx-count-animation');
     this.renderer.setProperty(this.elRef.nativeElement, 'innerHTML', 0);
     this.zone.runOutsideAngular(() => {
@@ -144,7 +154,7 @@ export class NgxCountAnimationDirective implements OnInit {
   private setupViewportCheck(): void {
     merge(
       !this.highPerformance ? interval(100, animationFrameScheduler) : timer(0),
-      this.countUpService.scroll$
+      this.countService.scroll$
     )
       .pipe(
         filter(() => this.checkIsInViewport),
@@ -155,7 +165,7 @@ export class NgxCountAnimationDirective implements OnInit {
   }
 
   /**
-   * Starts the count-up animation.
+   * Starts the count animation.
    */
   private startCount(): void {
     this.currentCount$
@@ -191,7 +201,8 @@ export class NgxCountAnimationDirective implements OnInit {
    */
   private calculateCurrentCount(count: number, duration: number): Observable<number> {
     const startTime = animationFrameScheduler.now();
-    return this.countUpService.interval.pipe(
+    this.startAnimation.emit();
+    return this.countService.interval.pipe(
       // calculate elapsed time
       map(() => animationFrameScheduler.now() - startTime),
       // calculate progress
@@ -205,7 +216,10 @@ export class NgxCountAnimationDirective implements OnInit {
       map(progress => this.oldCount + Math.round((count - this.oldCount) * progress * 100) / 100),
       // make sure that last emitted value is count
       endWith(count),
-      finalize(() => { this.oldCount = count; }),
+      finalize(() => {
+        this.oldCount = count;
+        this.endAnimation.emit();
+      }),
       distinctUntilChanged(),
     );
   }

@@ -1,6 +1,6 @@
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
-import { Inject, Injectable, NgZone, PLATFORM_ID } from '@angular/core';
-import { Observable, interval, animationFrameScheduler, share, fromEvent, throttleTime } from 'rxjs';
+import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { Observable, animationFrameScheduler, fromEvent, interval, share, throttleTime } from 'rxjs';
 
 /**
  * Service to create an observable that emits increasing numbers periodically.
@@ -8,7 +8,7 @@ import { Observable, interval, animationFrameScheduler, share, fromEvent, thrott
 @Injectable({
   providedIn: 'root'
 })
-export class NgxCountUpService {
+export class NgxCountService {
 
   public scroll$!: Observable<Event>;
 

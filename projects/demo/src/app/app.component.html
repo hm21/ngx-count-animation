@@ -6,7 +6,6 @@
   }
   <div class="row">
     <div
-      #ref
       [ngxCountAnimation]="example.value"
       [duration]="example.duration ?? 2000"
       [maximumFractionDigits]="example.maximumFractionDigits ?? 0"
@@ -22,3 +21,6 @@
   <div class="title">Trigger when scrolling in viewport</div>
   <div #ref [ngxCountAnimation]="1000000"></div>
 </section>
+
+
+<div ngxCountAnimation="1000000"></div>
