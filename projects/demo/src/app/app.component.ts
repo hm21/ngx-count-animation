@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { NgxCountAnimationDirective } from 'ngx-count-animation';
+import { NgxCountAnimationModule } from 'ngx-count-animation';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
-    NgxCountAnimationDirective
+    NgxCountAnimationModule
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',

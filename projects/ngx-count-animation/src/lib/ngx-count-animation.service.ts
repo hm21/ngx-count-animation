@@ -1,7 +1,7 @@
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
-import { Observable, animationFrameScheduler, fromEvent, interval, share, throttleTime } from 'rxjs';
-
+import { Observable, animationFrameScheduler, fromEvent, interval } from 'rxjs';
+import { share, throttleTime } from 'rxjs/operators';
 /**
  * Service to create an observable that emits increasing numbers periodically.
  */

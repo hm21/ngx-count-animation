@@ -1,4 +1,4 @@
-<h1>ngx-count-animation</h1>
+<h1>angular 9+ count-animation</h1>
 
 <div>
 
@@ -40,14 +40,14 @@ npm install ngx-count-animation
 #### Standalone component
 ```typescript
 import { Component } from '@angular/core';
-import { NgxCountAnimationDirective } from 'ngx-count-animation';
+import { NgxCountAnimationModule } from 'ngx-count-animation';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  imports: [ NgxCountAnimationDirective ],
+  imports: [ NgxCountAnimationModule ],
 })
 export class AppComponent {}
 ```
@@ -58,7 +58,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 
-import { NgxCountAnimationDirective } from 'ngx-count-animation';
+import { NgxCountAnimationModule } from 'ngx-count-animation';
 
 @NgModule({
   declarations: [
@@ -66,7 +66,7 @@ import { NgxCountAnimationDirective } from 'ngx-count-animation';
   ],
   imports: [
     BrowserModule,
-    NgxCountAnimationDirective,
+    NgxCountAnimationModule,
   ],
   bootstrap: [AppComponent]
 })

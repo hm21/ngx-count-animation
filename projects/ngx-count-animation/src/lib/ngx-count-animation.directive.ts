@@ -1,25 +1,30 @@
 import { isPlatformBrowser } from '@angular/common';
-import { DestroyRef, Directive, ElementRef, EventEmitter, Inject, Input, NgZone, OnInit, Output, PLATFORM_ID, Renderer2, booleanAttribute, inject, numberAttribute } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Directive, ElementRef, EventEmitter, Inject, Input, NgZone, OnDestroy, OnInit, Output, PLATFORM_ID, Renderer2 } from '@angular/core';
 import {
   BehaviorSubject,
   Observable,
+  Subject,
   animationFrameScheduler,
   combineLatest,
+  interval,
+  merge,
+  timer,
+} from 'rxjs';
+import {
   delay,
   distinctUntilChanged,
   endWith,
   filter,
   finalize,
-  interval,
   map,
-  merge,
   switchMap,
   take,
+  takeUntil,
   takeWhile,
-  timer
-} from 'rxjs';
+} from 'rxjs/operators';
 import { NgxCountService } from './ngx-count-animation.service';
+import { BooleanInput, coerceBooleanProperty } from './utils/coercion/coercion-boolean';
+import { NumberInput, coerceNumberProperty } from './utils/coercion/coercion-number';
 
 
 const easeOutQuad = (x: number): number => x * (2 - x);
@@ -30,9 +35,8 @@ const easeOutQuad = (x: number): number => x * (2 - x);
  */
 @Directive({
   selector: '[ngxCountAnimation]',
-  standalone: true,
 })
-export class NgxCountAnimationDirective implements OnInit {
+export class NgxCountAnimationDirective implements OnInit, OnDestroy {
   /**
    * Emits an event at the start of the animation.
    */
@@ -43,46 +47,73 @@ export class NgxCountAnimationDirective implements OnInit {
    */
   @Output() endAnimation = new EventEmitter<void>();
 
+
+  private _highPerformance: boolean = true;
   /** 
    * Without an active highPerformance mode, there is always an interval listener active that detects layout changes.
    * @type {boolean}
    * @default true
    */
-  @Input({ transform: booleanAttribute }) highPerformance: boolean = true;
+  @Input()
+  set highPerformance(value: BooleanInput) {
+    this._highPerformance = coerceBooleanProperty(value);
+  }
+  get highPerformance(): boolean {
+    return this._highPerformance;
+  }
+
+
+  private _maximumFractionDigits: number = 0;
   /**
   * The maximum number of fraction digits to display.
   * @type {number}
   * @default 0
   */
-  @Input({ transform: numberAttribute }) maximumFractionDigits: number = 0;
+  @Input()
+  set maximumFractionDigits(value: NumberInput) {
+    this._maximumFractionDigits = coerceNumberProperty(value, 0);
+  }
+  get maximumFractionDigits(): number {
+    return this._maximumFractionDigits;
+  }
+
+
+  private _minimumFractionDigits: number = 0;
   /**
-   * The minimum number of fraction digits to display.
-   * @type {number}
-   * @default 0
-   */
-  @Input({ transform: numberAttribute }) minimumFractionDigits: number = 0;
+    * The minimum number of fraction digits to display.
+    * @type {number}
+    * @default 0
+    */
+  @Input()
+  set minimumFractionDigits(value: any) {
+    this._minimumFractionDigits = coerceNumberProperty(value, 0);
+  }
+  get minimumFractionDigits(): number {
+    return this._minimumFractionDigits;
+  }
 
 
   /**
    * Sets the target count for the count animation.
    * @param count The target number to count to.
    */
-  @Input({ alias: 'ngxCountAnimation', transform: numberAttribute })
-  set count(count: number) {
+  @Input()
+  set ngxCountAnimation(value: NumberInput) {
     this.zone.runOutsideAngular(() => {
-      this.count$.next(count);
+      this.count$.next(coerceNumberProperty(value, 0));
     });
   }
+
 
   /**
    * Sets the duration of the count animation.
    * @param duration Duration of the animation in milliseconds.
    * @default 2_000
    */
-  @Input({ transform: numberAttribute })
-  set duration(duration: number) {
+  @Input()
+  set duration(duration: NumberInput) {
     this.zone.runOutsideAngular(() => {
-      this.duration$.next(duration);
+      this.duration$.next(coerceNumberProperty(duration, 2000));
     });
   }
 
@@ -90,14 +121,15 @@ export class NgxCountAnimationDirective implements OnInit {
    * Sets the duration based on the given value.
    * @param value A value to determine the duration of the animation.
    */
-  @Input({ transform: numberAttribute })
-  set durationFromValue(value: number) {
+  @Input()
+  set durationFromValue(value: NumberInput) {
     this.zone.runOutsideAngular(() => {
+      const val = coerceNumberProperty(value);
       this.duration$.next(
-        value > 100 ? 1500 :
-          value > 10 ? 1000 :
-            value > 3 ? 700 :
-              value > 1 ? 400 : 0
+        val > 100 ? 1500 :
+          val > 10 ? 1000 :
+            val > 3 ? 700 :
+              val > 1 ? 400 : 0
       );
     });
   }
@@ -109,13 +141,13 @@ export class NgxCountAnimationDirective implements OnInit {
 
   private readonly currentCount$ = this.createCurrentCountObservable();
 
-  private zone = inject(NgZone);
-  private destroyRef = inject(DestroyRef);
-  private countService = inject(NgxCountService);
-  private readonly elRef = inject<ElementRef<HTMLElement>>(ElementRef);
-  private readonly renderer = inject(Renderer2);
+  private destroy$ = new Subject();
 
   constructor(
+    private zone: NgZone,
+    private countService: NgxCountService,
+    private elRef: ElementRef<HTMLElement>,
+    private renderer: Renderer2,
     @Inject(PLATFORM_ID) private platformId: any,
   ) { }
 
@@ -123,6 +155,11 @@ export class NgxCountAnimationDirective implements OnInit {
     this.elRef.nativeElement.classList.add('ngx-count-animation');
     if (!isPlatformBrowser(this.platformId)) return;
     this.initializeCountAnimation();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next(true);
+    this.destroy$.complete();
   }
 
   /**
@@ -158,7 +195,7 @@ export class NgxCountAnimationDirective implements OnInit {
     )
       .pipe(
         filter(() => this.checkIsInViewport),
-        takeUntilDestroyed(this.destroyRef),
+        takeUntil(this.destroy$),
         take(1)
       )
       .subscribe(() => this.startCount());
@@ -170,7 +207,7 @@ export class NgxCountAnimationDirective implements OnInit {
   private startCount(): void {
     this.currentCount$
       .pipe(
-        takeUntilDestroyed(this.destroyRef)
+        takeUntil(this.destroy$)
       ).subscribe((currentCount) => {
         this.renderer.setProperty(
           this.elRef.nativeElement,
