@@ -2,9 +2,8 @@
 
 <div>
 
-[![npm version](https://badge.fury.io/js/ngx-count-animations.svg)](https://badge.fury.io/js/ngx-count-animations)
+[![npm version](https://badge.fury.io/js/ngx-count-animation.svg)](https://badge.fury.io/js/ngx-count-animation)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Twitter Follow](https://img.shields.io/twitter/follow/hm21.svg)](https://twitter.com/Frei2100)
 
 </div>
 
