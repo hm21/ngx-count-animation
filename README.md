@@ -10,7 +10,7 @@
 
 
 <a href="https://ngx-hm21.web.app/count-animation">
-    <img src="https://github.com/hm21/pro_image_editor/blob/stable/assets/showcase.gif?raw=true" width=450 />
+    <img src="https://github.com/hm21/ngx-count-animation/blob/master/assets/showcase.gif?raw=true" width=450 />
       <br/>
       Demo Website
 </a>
