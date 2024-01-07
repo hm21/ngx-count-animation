@@ -4,13 +4,16 @@
 
 [![npm version](https://badge.fury.io/js/ngx-count-animation.svg)](https://badge.fury.io/js/ngx-count-animation)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
+[![Issues](https://img.shields.io/github/issues/hm21/ngx-count-animation)](https://github.com/hm21/ngx-count-animation/issues)
+[![Web Demo](https://img.shields.io/badge/web-demo---?&color=0f7dff)](https://ngx-hm21.web.app/count-animation)
 </div>
 
-<h2 >Demo</h2>
-<div>
-https://ngx-hm21.web.app/count-animation
-</div>
+
+<a href="https://ngx-hm21.web.app/count-animation">
+    <img src="https://github.com/hm21/pro_image_editor/blob/stable/assets/showcase.gif?raw=true" width=450 />
+      <br/>
+      Demo Website
+</a>
 
 ## Table of contents
 
@@ -33,8 +36,6 @@ A package that elegantly animates number changes, creating a visually engaging t
 ```sh
 npm install ngx-count-animation
 ```
-
-### Using the directive
 
 #### Standalone component
 ```typescript
