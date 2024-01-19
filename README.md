@@ -3,6 +3,8 @@
 <div>
 
 [![npm version](https://badge.fury.io/js/ngx-count-animation.svg)](https://badge.fury.io/js/ngx-count-animation)
+[![NPM monthly downloads](https://img.shields.io/npm/dm/ngx-count-animation.svg)](https://badge.fury.io/js/ngx-count-animation)
+[![NPM total downloads](https://img.shields.io/npm/dt/ngx-count-animation.svg)](https://badge.fury.io/js/ngx-count-animation)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Issues](https://img.shields.io/github/issues/hm21/ngx-count-animation)](https://github.com/hm21/ngx-count-animation/issues)
 [![Web Demo](https://img.shields.io/badge/web-demo---?&color=0f7dff)](https://ngx-hm21.web.app/count-animation)
@@ -128,5 +130,5 @@ If you'd like to contribute code to this project, please follow these steps:
 2. Clone your forked repository to your local machine.
 
 ```bash
-git clone https://github.com/hm21/ngx-scroll-animations.git
+git clone https://github.com/hm21/ngx-count-animation.git
 ```
