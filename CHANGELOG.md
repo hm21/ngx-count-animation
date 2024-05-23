@@ -2,25 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
-<a name="1.1.1"></a>
 
-## [1.1.1] - 2024.02.16
+## `1.1.1` - 2024.02.16
 
 ### Fix
 
 - Export scroll-service that user can override the scroll-listener
 
-<a name="1.1.0"></a>
 
-## [1.1.0] - 2024.02.16
+## `1.1.0` - 2024.02.16
 
 ### Added
 
 - Enhance the functionality by implementing a feature that allows users to override the scroll listener to a different HTML element.
 
-<a name="1.0.4"></a>
 
-## [1.0.4] - 2023-12-20
+## `1.0.4` - 2023-12-20
 
 ### Added
 
@@ -34,15 +31,7 @@ All notable changes to this project will be documented in this file.
 
 - Updated dependencies to the latest versions.
 
-<a name="1.0.0"></a>
 
-## [1.0.0] - 2023-12-19
+## `1.0.0` - 2023-12-19
 
 _Initial release_
-
----
-
-[1.1.1]: https://github.com/your/project/releases/tag/1.1.1
-[1.1.0]: https://github.com/your/project/releases/tag/1.1.0
-[1.0.4]: https://github.com/your/project/releases/tag/1.0.4
-[1.0.0]: https://github.com/your/project/releases/tag/1.0.0
