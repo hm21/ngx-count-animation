@@ -1,4 +1,4 @@
-<h1>angular 9+ count-animation</h1>
+<h1>Angular Count Animations</h1>
 
 <div>
 

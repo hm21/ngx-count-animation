@@ -1,5 +1,5 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Directive, ElementRef, EventEmitter, Input, NgZone, OnDestroy, OnInit, Output, PLATFORM_ID, Renderer2, inject } from '@angular/core';
+import { Directive, ElementRef, EventEmitter, Inject, Input, NgZone, OnDestroy, OnInit, Optional, Output, PLATFORM_ID, Renderer2 } from '@angular/core';
 import {
   BehaviorSubject,
   Observable,
@@ -143,15 +143,14 @@ export class NgxCountAnimationDirective implements OnInit, OnDestroy {
 
   private destroy$ = new Subject();
 
-  private zone = inject(NgZone);
-  private countService = inject(NgxCountService);
-  private elRef = inject<ElementRef<HTMLElement>>(ElementRef);
-  private renderer = inject(Renderer2);
-  private platformId = inject(PLATFORM_ID);
-  private configs = inject<NgxCountAnimationConfigs | undefined>(NGX_COUNT_ANIMATION_CONFIGS);
   constructor(
+    private zone: NgZone,
+    private countService: NgxCountService,
+    private elRef: ElementRef<HTMLElement>,
+    private renderer: Renderer2,
+    @Inject(PLATFORM_ID) private platformId: any,
+    @Optional() @Inject(NGX_COUNT_ANIMATION_CONFIGS) configs: NgxCountAnimationConfigs | undefined,
   ) {
-    const configs = this.configs;
     if (configs) {
       if (configs.duration !== undefined) {
         this.duration = configs.duration;
