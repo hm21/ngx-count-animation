@@ -1,6 +1,6 @@
 {
   "name": "ngx-count-animation",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A package that elegantly animates number changes, creating a visually engaging transition from one value to another, perfect for counting or displaying real-time data updates.",
   "author": {
     "name": "Alex Frei",

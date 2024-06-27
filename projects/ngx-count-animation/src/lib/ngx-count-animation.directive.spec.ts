@@ -2,6 +2,8 @@ import { Component, DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed, fakeAsync, tick } from "@angular/core/testing";
 import { By } from '@angular/platform-browser';
 import { NgxCountAnimationDirective } from "./ngx-count-animation.directive";
+import { NgxCountAnimationModule } from './ngx-count-animation.module';
+import { provideNgxCountAnimations } from './ngx-count-animation.provider';
 
 @Component({
   selector: 'app-test-host',
@@ -10,13 +12,6 @@ import { NgxCountAnimationDirective } from "./ngx-count-animation.directive";
   `,
 })
 class TestHostComponent { }
-const mockElementRef = {
-  nativeElement: document.createElement('div')
-};
-const mockRenderer = {
-  setStyle: () => { }
-};
-
 describe('NgxCountAnimationDirective', () => {
   let fixture: ComponentFixture<TestHostComponent>;
   let directive: NgxCountAnimationDirective;
@@ -24,7 +19,11 @@ describe('NgxCountAnimationDirective', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [TestHostComponent, NgxCountAnimationDirective],
+      imports:[NgxCountAnimationModule],
+      declarations: [TestHostComponent],
+      providers:[
+        provideNgxCountAnimations(),
+      ]
     });
 
     fixture = TestBed.createComponent(TestHostComponent);
@@ -37,8 +36,8 @@ describe('NgxCountAnimationDirective', () => {
     expect(directive).toBeTruthy();
   });
 
-  it('should have default highPerformance set to true', () => {
-    expect(directive.detectLayoutChanges).toBeTruthy();
+  it('should have default detectLayoutChanges set to false', () => {
+    expect(directive.detectLayoutChanges).toBeFalsy();
   });
 
   it('should have default maximumFractionDigits set to 0', () => {
