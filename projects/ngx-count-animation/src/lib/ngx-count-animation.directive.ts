@@ -1,30 +1,30 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Directive, ElementRef, EventEmitter, Inject, Input, NgZone, OnDestroy, OnInit, Output, PLATFORM_ID, Renderer2 } from '@angular/core';
+import { Directive, ElementRef, EventEmitter, Inject, Input, NgZone, OnDestroy, OnInit, Optional, Output, PLATFORM_ID, Renderer2 } from '@angular/core';
 import {
   BehaviorSubject,
   Observable,
   Subject,
   animationFrameScheduler,
   combineLatest,
-  interval,
-  merge,
-  timer,
-} from 'rxjs';
-import {
   delay,
   distinctUntilChanged,
   endWith,
   filter,
   finalize,
+  interval,
   map,
+  merge,
   switchMap,
   take,
   takeUntil,
   takeWhile,
-} from 'rxjs/operators';
+  timer
+} from 'rxjs';
+import { NGX_COUNT_ANIMATION_CONFIGS } from './ngx-count-animation.module';
 import { NgxCountService } from './ngx-count-animation.service';
 import { BooleanInput, coerceBooleanProperty } from './utils/coercion/coercion-boolean';
 import { NumberInput, coerceNumberProperty } from './utils/coercion/coercion-number';
+import { NgxCountAnimationConfigs } from './utils/coercion/ngx-count-animation-configs';
 
 
 const easeOutQuad = (x: number): number => x * (2 - x);
@@ -34,6 +34,7 @@ const easeOutQuad = (x: number): number => x * (2 - x);
  * Directive to animate counting to a number.
  */
 @Directive({
+  standalone: true,
   selector: '[ngxCountAnimation]',
 })
 export class NgxCountAnimationDirective implements OnInit, OnDestroy {
@@ -48,22 +49,20 @@ export class NgxCountAnimationDirective implements OnInit, OnDestroy {
   @Output() endAnimation = new EventEmitter<void>();
 
 
-  private _highPerformance: boolean = true;
   /** 
-   * Without an active highPerformance mode, there is always an interval listener active that detects layout changes.
-   * @type {boolean}
+   * When `detectLayoutChanges` is set to `true`, there is always an interval listener active that detects layout changes.
    * @default true
    */
   @Input()
-  set highPerformance(value: BooleanInput) {
-    this._highPerformance = coerceBooleanProperty(value);
+  set detectLayoutChanges(value: BooleanInput) {
+    this._detectLayoutChanges = coerceBooleanProperty(value);
   }
-  get highPerformance(): boolean {
-    return this._highPerformance;
+  get detectLayoutChanges(): boolean {
+    return this._detectLayoutChanges;
   }
+  private _detectLayoutChanges: boolean = false;
 
 
-  private _maximumFractionDigits: number = 0;
   /**
   * The maximum number of fraction digits to display.
   * @type {number}
@@ -76,9 +75,9 @@ export class NgxCountAnimationDirective implements OnInit, OnDestroy {
   get maximumFractionDigits(): number {
     return this._maximumFractionDigits;
   }
+  private _maximumFractionDigits: number = 0;
 
 
-  private _minimumFractionDigits: number = 0;
   /**
     * The minimum number of fraction digits to display.
     * @type {number}
@@ -91,6 +90,7 @@ export class NgxCountAnimationDirective implements OnInit, OnDestroy {
   get minimumFractionDigits(): number {
     return this._minimumFractionDigits;
   }
+  private _minimumFractionDigits: number = 0;
 
 
   /**
@@ -134,7 +134,7 @@ export class NgxCountAnimationDirective implements OnInit, OnDestroy {
     });
   }
 
-  private oldCount = 0;
+  public oldCount = 0;
 
   private readonly count$ = new BehaviorSubject(0);
   private readonly duration$ = new BehaviorSubject(2_000);
@@ -149,12 +149,29 @@ export class NgxCountAnimationDirective implements OnInit, OnDestroy {
     private elRef: ElementRef<HTMLElement>,
     private renderer: Renderer2,
     @Inject(PLATFORM_ID) private platformId: any,
-  ) { }
+    @Optional() @Inject(NGX_COUNT_ANIMATION_CONFIGS) configs: NgxCountAnimationConfigs | undefined,
+  ) {
+    if (configs) {
+      if (configs.duration !== undefined) {
+        this.duration = configs.duration;
+      }
+      if (configs.detectLayoutChanges !== undefined) {
+        this.detectLayoutChanges = configs.detectLayoutChanges;
+      }
+      if (configs.maximumFractionDigits !== undefined) {
+        this.maximumFractionDigits = configs.maximumFractionDigits;
+      }
+      if (configs.minimumFractionDigits !== undefined) {
+        this.minimumFractionDigits = configs.minimumFractionDigits;
+      }
+    }
+  }
 
   ngOnInit(): void {
     this.elRef.nativeElement.classList.add('ngx-count-animation');
-    if (!isPlatformBrowser(this.platformId)) return;
-    this.initializeCountAnimation();
+    if (isPlatformBrowser(this.platformId)) {
+      this.initializeCountAnimation();
+    }
   }
 
   ngOnDestroy(): void {
@@ -190,7 +207,7 @@ export class NgxCountAnimationDirective implements OnInit, OnDestroy {
    */
   private setupViewportCheck(): void {
     merge(
-      !this.highPerformance ? interval(100, animationFrameScheduler) : timer(0),
+      this.detectLayoutChanges ? interval(100, animationFrameScheduler) : timer(0),
       this.countService.scroll$
     )
       .pipe(

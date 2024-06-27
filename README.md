@@ -8,8 +8,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Issues](https://img.shields.io/github/issues/hm21/ngx-count-animation)](https://github.com/hm21/ngx-count-animation/issues)
 [![Web Demo](https://img.shields.io/badge/web-demo---?&color=0f7dff)](https://ngx-hm21.web.app/count-animation)
-</div>
 
+</div>
 
 <img src="https://github.com/hm21/ngx-count-animation/blob/master/assets/showcase.gif?raw=true" width=450 />
 <a href="https://ngx-hm21.web.app/count-animation">
@@ -25,12 +25,11 @@
 - [Contributing](#contributing)
 - [License](LICENSE)
 
-
-<h2>About</h2>
+## About
 
 A package that elegantly animates number changes, creating a visually engaging transition from one value to another, perfect for counting or displaying real-time data updates.
 
-<h2>Getting started</h2>
+## Getting started
 
 ### Installation
 
@@ -38,80 +37,75 @@ A package that elegantly animates number changes, creating a visually engaging t
 npm install ngx-count-animation
 ```
 
-#### Standalone component
+### Import the directive
+
 ```typescript
-import { Component } from '@angular/core';
-import { NgxCountAnimationModule } from 'ngx-count-animation';
+import { Component } from "@angular/core";
+import { NgxCountAnimationDirective } from "ngx-count-animation";
 
 @Component({
-  selector: 'app-root',
+  selector: "app-root",
   standalone: true,
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss',
-  imports: [ NgxCountAnimationModule ],
+  templateUrl: "./app.component.html",
+  styleUrl: "./app.component.scss",
+  imports: [NgxCountAnimationDirective],
 })
 export class AppComponent {}
 ```
 
-#### Or for Module
+### Optional Global Configs
+
+Add `provideNgxCountAnimations` to your `app.config.ts` file as shown below.
+
 ```typescript
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
-import { AppComponent } from './app.component';
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideRouter(routes),
+    provideClientHydration(),
 
-import { NgxCountAnimationModule } from 'ngx-count-animation';
-
-@NgModule({
-  declarations: [
-    AppComponent
+    /// Add the code below
+    provideNgxCountAnimations({
+      duration: 2_000,
+      /// Other configs...
+    }),
   ],
-  imports: [
-    BrowserModule,
-    NgxCountAnimationModule,
-  ],
-  bootstrap: [AppComponent]
-})
-export class AppModule { }
+};
 ```
 
+<br/>
 
 <h2>Documentation</h2>
 
 ### Inputs
 
-| Option                   | Type    | Default | Comment                                                                                              |
-| :----------------------- | :------ | :------ | :--------------------------------------------------------------------------------------------------- |
-| ngxCountAnimation        | number  |         | Sets the target count for the count animation.                                                       |
-| maximumFractionDigits    | number  | 0       | The maximum number of fraction digits to display.                                                    |
-| minimumFractionDigits    | number  | 0       | The minimum number of fraction digits to display.                                                    |
-| duration                 | number  | 2000    | Sets the duration of the count animation.                                                            |
-| durationFromValue        | number  |         | Sets the duration based on the given value.                                                          |
-| highPerformance          | boolean | true    | When `highPerformance` is `false`, an interval listener is active to detect layout changes.          |
-
+| Option                | Type    | Default | Comment                                                                                                               |
+| :-------------------- | :------ | :------ | :-------------------------------------------------------------------------------------------------------------------- |
+| ngxCountAnimation     | number  |         | Sets the target count for the count animation.                                                                        |
+| maximumFractionDigits | number  | 0       | The maximum number of fraction digits to display.                                                                     |
+| minimumFractionDigits | number  | 0       | The minimum number of fraction digits to display.                                                                     |
+| duration              | number  | 2000    | Sets the duration of the count animation.                                                                             |
+| durationFromValue     | number  |         | Sets the duration based on the given value.                                                                           |
+| detectLayoutChanges   | boolean | true    | When `detectLayoutChanges` is set to `true`, there is always an interval listener active that detects layout changes. |
 
 ### Outputs
-| Option          | Type               | Comment                                       |
-|:----------------|:-------------------|:----------------------------------------------|
-| startAnimation  | EventEmitter<void> | Emits an event at the start of the animation. |
-| endAnimation    | EventEmitter<void> | Emits an event at the end of the animation.   |
 
+| Option         | Type               | Comment                                       |
+| :------------- | :----------------- | :-------------------------------------------- |
+| startAnimation | EventEmitter<void> | Emits an event at the start of the animation. |
+| endAnimation   | EventEmitter<void> | Emits an event at the end of the animation.   |
 
 <h2>Example</h2>
 
 #### Simple example
+
 ```html
 <div ngxCountAnimation="1000000"></div>
 ```
 
 #### Complete example demonstrating all properties
+
 ```html
- <div
-      ngxCountAnimation="123456789"
-      duration="2000"
-      maximumFractionDigits="0"
-      minimumFractionDigits="0"
-      highPerformance="true"
-    ></div>
+<div ngxCountAnimation="123456789" duration="2000" maximumFractionDigits="0" minimumFractionDigits="0" detectLayoutChanges="true"></div>
 ```
 
 ## Contributing

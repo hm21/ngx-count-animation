@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { NgxCountAnimationModule } from 'ngx-count-animation';
+import { NgxCountAnimationDirective } from 'ngx-count-animation';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
-    NgxCountAnimationModule
+    NgxCountAnimationDirective
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
@@ -35,12 +35,12 @@ export class AppComponent {
       value: 1_000_000,
     },
     {
-      title: 'Disabled "highPerformance"',
-      subtitle: `When highPerformance mode is not active, there is an ongoing interval listener that continuously monitors layout changes. 
+      title: 'Enable "detectLayoutChanges"',
+      subtitle: `When "detectLayoutChanges" is "true", there is an ongoing interval listener that continuously monitors layout changes. 
       For instance, when transitioning from a skeleton screen to the normal screen and adjusting element positions, 
       this ensures that your animations will reliably trigger.
       `,
-      highPerformance: false,
+      detectLayoutChanges: true,
       value: 1_000_000
     },
   ];
@@ -57,5 +57,5 @@ interface ExampleI {
   duration?: number;
   maximumFractionDigits?: number;
   minimumFractionDigits?: number;
-  highPerformance?: boolean;
+  detectLayoutChanges?: boolean;
 }

@@ -38,7 +38,7 @@ describe('NgxCountAnimationDirective', () => {
   });
 
   it('should have default highPerformance set to true', () => {
-    expect(directive.highPerformance).toBeTruthy();
+    expect(directive.detectLayoutChanges).toBeTruthy();
   });
 
   it('should have default maximumFractionDigits set to 0', () => {
