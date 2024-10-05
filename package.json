@@ -1,6 +1,6 @@
 {
   "name": "ngx-count-animation",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "A package that elegantly animates number changes, creating a visually engaging transition from one value to another, perfect for counting or displaying real-time data updates.",
   "author": {
     "name": "Alex Frei",
@@ -46,7 +46,6 @@
     "@angular/platform-server": "^17.0.0",
     "@angular/router": "^17.0.0",
     "@angular/ssr": "^17.0.7",
-    "express": "^4.18.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.2"
@@ -58,6 +57,7 @@
     "@types/express": "^4.17.17",
     "@types/jasmine": "~5.1.0",
     "@types/node": "^18.18.0",
+    "copyfiles": "^2.4.1",
     "jasmine-core": "~5.1.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
@@ -65,7 +65,6 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "ng-packagr": "^17.0.0",
-    "copyfiles": "^2.4.1",
     "typescript": "~5.2.2"
   }
 }

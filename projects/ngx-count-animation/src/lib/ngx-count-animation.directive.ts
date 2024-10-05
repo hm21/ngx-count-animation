@@ -134,6 +134,22 @@ export class NgxCountAnimationDirective implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Sets and gets the initial start delay value. 
+   * The input value is coerced into a number with a default of 0.
+   * 
+   * @Input() initialStartDelay - The delay value to be applied at the start. 
+   * If the input is not a valid number, it will default to 0.
+   */
+  @Input()
+  set initialStartDelay(value: any) {
+    this._initialStartDelay = coerceNumberProperty(value, 0);
+  }
+  get initialStartDelay(): number {
+    return this._initialStartDelay;
+  }
+  private _initialStartDelay: number = 0;
+
   public oldCount = 0;
 
   private readonly count$ = new BehaviorSubject(0);
@@ -224,6 +240,7 @@ export class NgxCountAnimationDirective implements OnInit, OnDestroy {
   private startCount(): void {
     this.currentCount$
       .pipe(
+        delay(this.initialStartDelay),
         takeUntil(this.destroy$)
       ).subscribe((currentCount) => {
         this.renderer.setProperty(

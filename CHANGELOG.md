@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## `2.1.0` - 2024.10.05
+### Feat
+- Add `initialStartDelay` parameter to delay animation start
+
 ## `2.0.2` - 2024.06.27
 ### Fix
 - Ensure global configs are optional.
