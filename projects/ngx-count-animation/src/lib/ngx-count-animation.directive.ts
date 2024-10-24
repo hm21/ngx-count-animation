@@ -1,9 +1,17 @@
-import { isPlatformBrowser } from '@angular/common';
-import { Directive, ElementRef, EventEmitter, Inject, Input, NgZone, OnDestroy, OnInit, Optional, Output, PLATFORM_ID, Renderer2 } from '@angular/core';
 import {
-  BehaviorSubject,
+  DestroyRef,
+  Directive,
+  ElementRef,
+  OnInit,
+  booleanAttribute,
+  inject,
+  input,
+  numberAttribute,
+  output,
+} from '@angular/core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import {
   Observable,
-  Subject,
   animationFrameScheduler,
   combineLatest,
   delay,
@@ -16,19 +24,17 @@ import {
   merge,
   switchMap,
   take,
-  takeUntil,
   takeWhile,
-  timer
+  timer,
 } from 'rxjs';
-import { NGX_COUNT_ANIMATION_CONFIGS } from './ngx-count-animation.provider';
 import { NgxCountService } from './ngx-count-animation.service';
-import { BooleanInput, coerceBooleanProperty } from './utils/coercion/coercion-boolean';
-import { NumberInput, coerceNumberProperty } from './utils/coercion/coercion-number';
-import { NgxCountAnimationConfigs } from './utils/coercion/ngx-count-animation-configs';
-
+import { NGX_COUNT_ANIMATION_CONFIGS } from './provider/ngx-count-animation.provider';
+import {
+  IS_BROWSER,
+  providePlatformDetection,
+} from './provider/platform.provider';
 
 const easeOutQuad = (x: number): number => x * (2 - x);
-
 
 /**
  * Directive to animate counting to a number.
@@ -36,177 +42,99 @@ const easeOutQuad = (x: number): number => x * (2 - x);
 @Directive({
   standalone: true,
   selector: '[ngxCountAnimation]',
+  providers: [providePlatformDetection()],
 })
-export class NgxCountAnimationDirective implements OnInit, OnDestroy {
-  /**
-   * Emits an event at the start of the animation.
-   */
-  @Output() startAnimation = new EventEmitter<void>();
+export class NgxCountAnimationDirective implements OnInit {
+  private isBrowser = inject(IS_BROWSER);
+  private destroyRef = inject(DestroyRef);
+  private countService = inject(NgxCountService);
+  private elRef = inject<ElementRef<HTMLElement>>(ElementRef);
+  private configs = inject(NGX_COUNT_ANIMATION_CONFIGS, { optional: true });
+
+  /** Emits an event at the start of the animation. */
+  public startAnimation = output();
+  /** Emits an event at the end of the animation.*/
+  public endAnimation = output();
 
   /**
-   * Emits an event at the end of the animation.
-   */
-  @Output() endAnimation = new EventEmitter<void>();
-
-
-  /** 
-   * When `detectLayoutChanges` is set to `true`, there is always an interval listener active that detects layout changes.
+   * When `enableLayoutChangeDetection` is set to `true`, there is always an interval listener active that detects layout changes.
    * @default true
    */
-  @Input()
-  set detectLayoutChanges(value: BooleanInput) {
-    this._detectLayoutChanges = coerceBooleanProperty(value);
-  }
-  get detectLayoutChanges(): boolean {
-    return this._detectLayoutChanges;
-  }
-  private _detectLayoutChanges: boolean = false;
-
-
+  public enableLayoutChangeDetection = input(
+    this.configs?.enableLayoutChangeDetection ?? false,
+    { transform: booleanAttribute }
+  );
   /**
-  * The maximum number of fraction digits to display.
-  * @type {number}
-  * @default 0
-  */
-  @Input()
-  set maximumFractionDigits(value: NumberInput) {
-    this._maximumFractionDigits = coerceNumberProperty(value, 0);
-  }
-  get maximumFractionDigits(): number {
-    return this._maximumFractionDigits;
-  }
-  private _maximumFractionDigits: number = 0;
-
-
+   * Boolean flag to enable running functionality only when the element is in the viewport.
+   * @default true
+   */
+  public enableRunOnlyInViewport = input(
+    this.configs?.enableRunOnlyInViewport ?? true,
+    { transform: booleanAttribute }
+  );
   /**
-    * The minimum number of fraction digits to display.
-    * @type {number}
-    * @default 0
-    */
-  @Input()
-  set minimumFractionDigits(value: any) {
-    this._minimumFractionDigits = coerceNumberProperty(value, 0);
-  }
-  get minimumFractionDigits(): number {
-    return this._minimumFractionDigits;
-  }
-  private _minimumFractionDigits: number = 0;
-
-
+   * The maximum number of fraction digits to display.
+   * @default 0
+   */
+  public maximumFractionDigits = input(
+    this.configs?.maximumFractionDigits ?? 0,
+    { transform: numberAttribute }
+  );
+  /**
+   * The minimum number of fraction digits to display.
+   * @default 0
+   */
+  public minimumFractionDigits = input(
+    this.configs?.minimumFractionDigits ?? 0,
+    { transform: numberAttribute }
+  );
   /**
    * Sets the target count for the count animation.
    * @param count The target number to count to.
    */
-  @Input()
-  set ngxCountAnimation(value: NumberInput) {
-    this.zone.runOutsideAngular(() => {
-      this.count$.next(coerceNumberProperty(value, 0));
-    });
-  }
-
-
+  public ngxCountAnimation = input(0, { transform: numberAttribute });
   /**
    * Sets the duration of the count animation.
    * @param duration Duration of the animation in milliseconds.
    * @default 2_000
    */
-  @Input()
-  set duration(duration: NumberInput) {
-    this.zone.runOutsideAngular(() => {
-      this.duration$.next(coerceNumberProperty(duration, 2000));
-    });
-  }
-
+  public duration = input(this.configs?.duration ?? 2000, {
+    transform: numberAttribute,
+  });
   /**
    * Sets the duration based on the given value.
    * @param value A value to determine the duration of the animation.
    */
-  @Input()
-  set durationFromValue(value: NumberInput) {
-    this.zone.runOutsideAngular(() => {
-      const val = coerceNumberProperty(value);
-      this.duration$.next(
-        val > 100 ? 1500 :
-          val > 10 ? 1000 :
-            val > 3 ? 700 :
-              val > 1 ? 400 : 0
-      );
-    });
-  }
-
+  public durationFromValue = input(undefined, {
+    transform: numberAttribute,
+  });
   /**
-   * Sets and gets the initial start delay value. 
+   * Sets and gets the initial start delay value.
    * The input value is coerced into a number with a default of 0.
-   * 
-   * @Input() initialStartDelay - The delay value to be applied at the start. 
-   * If the input is not a valid number, it will default to 0.
    */
-  @Input()
-  set initialStartDelay(value: any) {
-    this._initialStartDelay = coerceNumberProperty(value, 0);
-  }
-  get initialStartDelay(): number {
-    return this._initialStartDelay;
-  }
-  private _initialStartDelay: number = 0;
+  public initialStartDelay = input(0, { transform: numberAttribute });
 
   public oldCount = 0;
 
-  private readonly count$ = new BehaviorSubject(0);
-  private readonly duration$ = new BehaviorSubject(2_000);
-
   private readonly currentCount$ = this.createCurrentCountObservable();
-
-  private destroy$ = new Subject();
-
-  constructor(
-    private zone: NgZone,
-    private countService: NgxCountService,
-    private elRef: ElementRef<HTMLElement>,
-    private renderer: Renderer2,
-    @Inject(PLATFORM_ID) private platformId: any,
-    @Optional() @Inject(NGX_COUNT_ANIMATION_CONFIGS) configs: NgxCountAnimationConfigs | undefined,
-  ) {
-    if (configs) {
-      if (configs.duration !== undefined) {
-        this.duration = configs.duration;
-      }
-      if (configs.detectLayoutChanges !== undefined) {
-        this.detectLayoutChanges = configs.detectLayoutChanges;
-      }
-      if (configs.maximumFractionDigits !== undefined) {
-        this.maximumFractionDigits = configs.maximumFractionDigits;
-      }
-      if (configs.minimumFractionDigits !== undefined) {
-        this.minimumFractionDigits = configs.minimumFractionDigits;
-      }
-    }
-  }
 
   ngOnInit(): void {
     this.elRef.nativeElement.classList.add('ngx-count-animation');
-    if (isPlatformBrowser(this.platformId)) {
-      this.initializeCountAnimation();
-    }
+    this.initializeCountAnimation();
   }
-
-  ngOnDestroy(): void {
-    this.destroy$.next(true);
-    this.destroy$.complete();
-  }
-
   /**
    * Initializes the count animation if the element is in the viewport.
    */
   private initializeCountAnimation(): void {
-    this.renderer.setProperty(this.elRef.nativeElement, 'innerHTML', 0);
-    this.zone.runOutsideAngular(() => {
-      if (this.checkIsInViewport) {
+    this.elRef.nativeElement.innerHTML = '0';
+
+    if (this.isBrowser) {
+      if (this.checkIsInViewport || !this.enableRunOnlyInViewport()) {
         this.startCount();
       } else {
         this.setupViewportCheck();
       }
-    });
+    }
   }
 
   /**
@@ -223,13 +151,15 @@ export class NgxCountAnimationDirective implements OnInit, OnDestroy {
    */
   private setupViewportCheck(): void {
     merge(
-      this.detectLayoutChanges ? interval(100, animationFrameScheduler) : timer(0),
+      this.enableLayoutChangeDetection()
+        ? interval(100, animationFrameScheduler)
+        : timer(0),
       this.countService.scroll$
     )
       .pipe(
         filter(() => this.checkIsInViewport),
-        takeUntil(this.destroy$),
-        take(1)
+        take(1),
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(() => this.startCount());
   }
@@ -240,16 +170,19 @@ export class NgxCountAnimationDirective implements OnInit, OnDestroy {
   private startCount(): void {
     this.currentCount$
       .pipe(
-        delay(this.initialStartDelay),
-        takeUntil(this.destroy$)
-      ).subscribe((currentCount) => {
-        this.renderer.setProperty(
-          this.elRef.nativeElement,
-          'innerHTML',
-          currentCount.toLocaleString(['de-ch'], {
-            maximumFractionDigits: Math.max(this.minimumFractionDigits, this.maximumFractionDigits),
-            minimumFractionDigits: this.minimumFractionDigits
-          })
+        delay(this.initialStartDelay()),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe((currentCount) => {
+        this.elRef.nativeElement.innerHTML = currentCount.toLocaleString(
+          ['de-ch'],
+          {
+            maximumFractionDigits: Math.max(
+              this.minimumFractionDigits(),
+              this.maximumFractionDigits()
+            ),
+            minimumFractionDigits: this.minimumFractionDigits(),
+          }
         );
       });
   }
@@ -259,9 +192,30 @@ export class NgxCountAnimationDirective implements OnInit, OnDestroy {
    * @returns {Observable<number>} An observable emitting the current count.
    */
   private createCurrentCountObservable(): Observable<number> {
-    return combineLatest([this.count$, this.duration$]).pipe(
+    return combineLatest([
+      toObservable(this.ngxCountAnimation),
+      merge(
+        toObservable(this.duration),
+        toObservable(this.durationFromValue).pipe(
+          filter((val) => val !== undefined),
+          map((val) => {
+            return val > 100
+              ? 1500
+              : val > 10
+              ? 1000
+              : val > 3
+              ? 700
+              : val > 1
+              ? 400
+              : 0;
+          })
+        )
+      ),
+    ]).pipe(
       delay(100),
-      switchMap(([count, duration]) => this.calculateCurrentCount(count, duration)),
+      switchMap(([count, duration]) =>
+        this.calculateCurrentCount(count, duration)
+      )
     );
   }
   /**
@@ -270,28 +224,35 @@ export class NgxCountAnimationDirective implements OnInit, OnDestroy {
    * @param duration The duration of the animation.
    * @returns {Observable<number>} An observable emitting the current count.
    */
-  private calculateCurrentCount(count: number, duration: number): Observable<number> {
+  private calculateCurrentCount(
+    count: number,
+    duration: number
+  ): Observable<number> {
     const startTime = animationFrameScheduler.now();
     this.startAnimation.emit();
     return this.countService.interval.pipe(
       // calculate elapsed time
       map(() => animationFrameScheduler.now() - startTime),
       // calculate progress
-      map(elapsedTime => elapsedTime / duration),
+      map((elapsedTime) => elapsedTime / duration),
       // complete when progress is greater than 1
-      takeWhile(progress => progress <= 1),
+      takeWhile((progress) => progress <= 1),
       // apply quadratic ease-out function
       // for faster start and slower end of counting
       map(easeOutQuad),
       // calculate current count
-      map(progress => this.oldCount + Math.round((count - this.oldCount) * progress * 100) / 100),
+      map(
+        (progress) =>
+          this.oldCount +
+          Math.round((count - this.oldCount) * progress * 100) / 100
+      ),
       // make sure that last emitted value is count
       endWith(count),
       finalize(() => {
         this.oldCount = count;
         this.endAnimation.emit();
       }),
-      distinctUntilChanged(),
+      distinctUntilChanged()
     );
   }
 }

@@ -1,17 +1,25 @@
-import { Component, DebugElement } from '@angular/core';
-import { ComponentFixture, TestBed, fakeAsync, tick } from "@angular/core/testing";
+import {
+  Component,
+  DebugElement,
+  provideExperimentalZonelessChangeDetection,
+  signal,
+} from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { NgxCountAnimationDirective } from "./ngx-count-animation.directive";
-import { NgxCountAnimationModule } from './ngx-count-animation.module';
-import { provideNgxCountAnimations } from './ngx-count-animation.provider';
+import { lastValueFrom, timer } from 'rxjs';
+import { NgxCountAnimationDirective } from './ngx-count-animation.directive';
+import { provideNgxCountAnimations } from './provider/ngx-count-animation.provider';
 
 @Component({
   selector: 'app-test-host',
   template: `
-    <div ngxCountAnimation="100000"></div>
+    <div [ngxCountAnimation]="countValue()" [duration]="duration()"></div>
   `,
 })
-class TestHostComponent { }
+class TestHostComponent {
+  duration = signal(2000);
+  countValue = signal(0);
+}
 describe('NgxCountAnimationDirective', () => {
   let fixture: ComponentFixture<TestHostComponent>;
   let directive: NgxCountAnimationDirective;
@@ -19,15 +27,19 @@ describe('NgxCountAnimationDirective', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports:[NgxCountAnimationModule],
       declarations: [TestHostComponent],
-      providers:[
+      imports: [NgxCountAnimationDirective],
+      providers: [
         provideNgxCountAnimations(),
-      ]
+        provideExperimentalZonelessChangeDetection(),
+      ],
     });
 
     fixture = TestBed.createComponent(TestHostComponent);
-    directive = fixture.debugElement.query(By.directive(NgxCountAnimationDirective)).injector.get(NgxCountAnimationDirective);
+    directive = fixture.debugElement
+      .query(By.directive(NgxCountAnimationDirective))
+      .injector.get(NgxCountAnimationDirective);
+
     element = fixture.debugElement.query(By.css('div'));
     fixture.detectChanges();
   });
@@ -36,26 +48,29 @@ describe('NgxCountAnimationDirective', () => {
     expect(directive).toBeTruthy();
   });
 
-  it('should have default detectLayoutChanges set to false', () => {
-    expect(directive.detectLayoutChanges).toBeFalsy();
+  it('should have default enableLayoutChangeDetection set to false', () => {
+    expect(directive.enableLayoutChangeDetection()).toBeFalsy();
   });
 
   it('should have default maximumFractionDigits set to 0', () => {
-    expect(directive.maximumFractionDigits).toEqual(0);
+    expect(directive.maximumFractionDigits()).toEqual(0);
   });
 
   it('should have default minimumFractionDigits set to 0', () => {
-    expect(directive.minimumFractionDigits).toEqual(0);
+    expect(directive.minimumFractionDigits()).toEqual(0);
   });
 
-  it('should start counting when ngxCountAnimation is set', fakeAsync(() => {
-    const initDelay = 100;
+  it('should start counting when ngxCountAnimation is set', async () => {
     const duration = 100;
     const countValue = 100;
-    directive.ngxCountAnimation = countValue;
-    directive.duration = duration;
+
+    fixture.componentInstance.duration.set(duration);
+    fixture.componentInstance.countValue.set(countValue);
+
     fixture.detectChanges();
-    tick(duration + initDelay);
+
+    await lastValueFrom(timer(duration + 100));
+
     expect(element.nativeElement.textContent).toContain(countValue.toString());
-  }));
+  });
 });

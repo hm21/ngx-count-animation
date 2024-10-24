@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## `3.0.0` - 2024.10.24
+### Breaking Changes
+- **Renamed**: The input property `detectLayoutChanges` is now `enableLayoutChangeDetection`.
+- **Angular Version**: Minimum supported version is now Angular 18.
+- **Removed**: `zone.js` has been completely removed.
+
+### New Features
+- **Viewport Control**: Added a new input option `enableRunOnlyInViewport`, allowing functionality to execute only when the element is visible in the viewport.
+
+### Other Updates
+- General code optimizations and improvements for better performance.
+
+
 ## `2.1.0` - 2024.10.05
 ### Feat
 - Add `initialStartDelay` parameter to delay animation start

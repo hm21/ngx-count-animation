@@ -1,3 +1,4 @@
+import { provideExperimentalZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { NgxCountService } from './ngx-count-animation.service';
 
@@ -6,7 +7,10 @@ describe('NgxCountService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [NgxCountService],
+      providers: [
+        NgxCountService,
+        provideExperimentalZonelessChangeDetection(),
+      ],
     });
     service = TestBed.inject(NgxCountService);
   });

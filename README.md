@@ -53,8 +53,6 @@ import { NgxCountAnimationDirective } from "ngx-count-animation";
 export class AppComponent {}
 ```
 
-### Optional Global Configs
-
 Add `provideNgxCountAnimations` to your `app.config.ts` file as shown below.
 
 ```typescript
@@ -64,10 +62,7 @@ export const appConfig: ApplicationConfig = {
     provideClientHydration(),
 
     /// Add the code below
-    provideNgxCountAnimations({
-      duration: 2_000,
-      /// Other configs...
-    }),
+    provideNgxCountAnimations(),
   ],
 };
 ```
@@ -78,21 +73,21 @@ export const appConfig: ApplicationConfig = {
 
 ### Inputs
 
-| Option                | Type    | Default | Comment                                                                                                               |
-| :-------------------- | :------ | :------ | :-------------------------------------------------------------------------------------------------------------------- |
-| ngxCountAnimation     | number  |         | Sets the target count for the count animation.                                                                        |
-| maximumFractionDigits | number  | 0       | The maximum number of fraction digits to display.                                                                     |
-| minimumFractionDigits | number  | 0       | The minimum number of fraction digits to display.                                                                     |
-| duration              | number  | 2000    | Sets the duration of the count animation.                                                                             |
-| durationFromValue     | number  |         | Sets the duration based on the given value.                                                                           |
-| detectLayoutChanges   | boolean | true    | When `detectLayoutChanges` is set to `true`, there is always an interval listener active that detects layout changes. |
+| Option                      | Type    | Default | Comment                                                                                                                       |
+| :-------------------------- | :------ | :------ | :---------------------------------------------------------------------------------------------------------------------------- |
+| ngxCountAnimation           | number  |         | Sets the target count for the count animation.                                                                                |
+| maximumFractionDigits       | number  | 0       | The maximum number of fraction digits to display.                                                                             |
+| minimumFractionDigits       | number  | 0       | The minimum number of fraction digits to display.                                                                             |
+| duration                    | number  | 2000    | Sets the duration of the count animation.                                                                                     |
+| durationFromValue           | number  |         | Sets the duration based on the given value.                                                                                   |
+| enableLayoutChangeDetection | boolean | true    | When `enableLayoutChangeDetection` is set to `true`, there is always an interval listener active that detects layout changes. |
 
 ### Outputs
 
 | Option         | Type               | Comment                                       |
 | :------------- | :----------------- | :-------------------------------------------- |
-| startAnimation | EventEmitter<void> | Emits an event at the start of the animation. |
-| endAnimation   | EventEmitter<void> | Emits an event at the end of the animation.   |
+| startAnimation | output<void> | Emits an event at the start of the animation. |
+| endAnimation   | output<void> | Emits an event at the end of the animation.   |
 
 <h2>Example</h2>
 
@@ -105,7 +100,7 @@ export const appConfig: ApplicationConfig = {
 #### Complete example demonstrating all properties
 
 ```html
-<div ngxCountAnimation="123456789" duration="2000" maximumFractionDigits="0" minimumFractionDigits="0" detectLayoutChanges="true"></div>
+<div ngxCountAnimation="123456789" duration="2000" maximumFractionDigits="0" minimumFractionDigits="0" enableLayoutChangeDetection="true"></div>
 ```
 
 ## Contributing

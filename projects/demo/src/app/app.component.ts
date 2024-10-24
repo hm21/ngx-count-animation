@@ -35,12 +35,12 @@ export class AppComponent {
       value: 1_000_000,
     },
     {
-      title: 'Enable "detectLayoutChanges"',
-      subtitle: `When "detectLayoutChanges" is "true", there is an ongoing interval listener that continuously monitors layout changes. 
+      title: 'enableLayoutChangeDetection',
+      subtitle: `When "enableLayoutChangeDetection" is "true", there is an ongoing interval listener that continuously monitors layout changes. 
       For instance, when transitioning from a skeleton screen to the normal screen and adjusting element positions, 
       this ensures that your animations will reliably trigger.
       `,
-      detectLayoutChanges: true,
+      enableLayoutChangeDetection: true,
       value: 1_000_000
     },
   ];
@@ -57,5 +57,5 @@ interface ExampleI {
   duration?: number;
   maximumFractionDigits?: number;
   minimumFractionDigits?: number;
-  detectLayoutChanges?: boolean;
+  enableLayoutChangeDetection?: boolean;
 }
