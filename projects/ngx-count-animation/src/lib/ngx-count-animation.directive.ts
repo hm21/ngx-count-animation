@@ -2,6 +2,7 @@ import {
   DestroyRef,
   Directive,
   ElementRef,
+  NgZone,
   OnInit,
   booleanAttribute,
   inject,
@@ -28,11 +29,11 @@ import {
   timer,
 } from 'rxjs';
 import { NgxCountService } from './ngx-count-animation.service';
-import { NGX_COUNT_ANIMATION_CONFIGS } from './provider/ngx-count-animation.provider';
+import { NGX_COUNT_ANIMATION_CONFIGS } from './providers/ngx-count-animation.provider';
 import {
   IS_BROWSER,
   providePlatformDetection,
-} from './provider/platform.provider';
+} from './providers/platform.provider';
 
 const easeOutQuad = (x: number): number => x * (2 - x);
 
@@ -47,6 +48,7 @@ const easeOutQuad = (x: number): number => x * (2 - x);
 export class NgxCountAnimationDirective implements OnInit {
   private isBrowser = inject(IS_BROWSER);
   private destroyRef = inject(DestroyRef);
+  private ngZone = inject(NgZone);
   private countService = inject(NgxCountService);
   private elRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private configs = inject(NGX_COUNT_ANIMATION_CONFIGS, { optional: true });
@@ -129,11 +131,13 @@ export class NgxCountAnimationDirective implements OnInit {
     this.elRef.nativeElement.innerHTML = '0';
 
     if (this.isBrowser) {
-      if (this.checkIsInViewport || !this.enableRunOnlyInViewport()) {
-        this.startCount();
-      } else {
-        this.setupViewportCheck();
-      }
+      this.ngZone.runOutsideAngular(() => {
+        if (this.checkIsInViewport || !this.enableRunOnlyInViewport()) {
+          this.startCount();
+        } else {
+          this.setupViewportCheck();
+        }
+      });
     }
   }
 
@@ -168,23 +172,25 @@ export class NgxCountAnimationDirective implements OnInit {
    * Starts the count animation.
    */
   private startCount(): void {
-    this.currentCount$
-      .pipe(
-        delay(this.initialStartDelay()),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe((currentCount) => {
-        this.elRef.nativeElement.innerHTML = currentCount.toLocaleString(
-          ['de-ch'],
-          {
-            maximumFractionDigits: Math.max(
-              this.minimumFractionDigits(),
-              this.maximumFractionDigits()
-            ),
-            minimumFractionDigits: this.minimumFractionDigits(),
-          }
-        );
-      });
+    this.ngZone.runOutsideAngular(() => {
+      this.currentCount$
+        .pipe(
+          delay(this.initialStartDelay()),
+          takeUntilDestroyed(this.destroyRef)
+        )
+        .subscribe((currentCount) => {
+          this.elRef.nativeElement.innerHTML = currentCount.toLocaleString(
+            ['de-ch'],
+            {
+              maximumFractionDigits: Math.max(
+                this.minimumFractionDigits(),
+                this.maximumFractionDigits()
+              ),
+              minimumFractionDigits: this.minimumFractionDigits(),
+            }
+          );
+        });
+    });
   }
 
   /**
@@ -192,31 +198,33 @@ export class NgxCountAnimationDirective implements OnInit {
    * @returns {Observable<number>} An observable emitting the current count.
    */
   private createCurrentCountObservable(): Observable<number> {
-    return combineLatest([
-      toObservable(this.ngxCountAnimation),
-      merge(
-        toObservable(this.duration),
-        toObservable(this.durationFromValue).pipe(
-          filter((val) => val !== undefined),
-          map((val) => {
-            return val > 100
-              ? 1500
-              : val > 10
-              ? 1000
-              : val > 3
-              ? 700
-              : val > 1
-              ? 400
-              : 0;
-          })
+    return this.ngZone.runOutsideAngular(() => {
+      return combineLatest([
+        toObservable(this.ngxCountAnimation),
+        merge(
+          toObservable(this.duration),
+          toObservable(this.durationFromValue).pipe(
+            filter((val) => val !== undefined),
+            map((val) => {
+              return val > 100
+                ? 1500
+                : val > 10
+                ? 1000
+                : val > 3
+                ? 700
+                : val > 1
+                ? 400
+                : 0;
+            })
+          )
+        ),
+      ]).pipe(
+        delay(100),
+        switchMap(([count, duration]) =>
+          this.calculateCurrentCount(count, duration)
         )
-      ),
-    ]).pipe(
-      delay(100),
-      switchMap(([count, duration]) =>
-        this.calculateCurrentCount(count, duration)
-      )
-    );
+      );
+    });
   }
   /**
    * Calculates the current count based on progress and duration.

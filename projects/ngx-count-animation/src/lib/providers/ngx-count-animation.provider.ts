@@ -1,5 +1,5 @@
 import { InjectionToken, Provider } from '@angular/core';
-import { NgxCountAnimationConfigs } from '../utils/ngx-count-animation.config';
+import { NgxCountAnimationConfigs } from '../interfaces/ngx-count-animation.interface';
 
 export const NGX_COUNT_ANIMATION_CONFIGS =
   new InjectionToken<NgxCountAnimationConfigs>('NgxCountAnimationConfigs');

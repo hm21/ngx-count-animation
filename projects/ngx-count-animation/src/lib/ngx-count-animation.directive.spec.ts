@@ -8,7 +8,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { lastValueFrom, timer } from 'rxjs';
 import { NgxCountAnimationDirective } from './ngx-count-animation.directive';
-import { provideNgxCountAnimations } from './provider/ngx-count-animation.provider';
+import { provideNgxCountAnimations } from './providers/ngx-count-animation.provider';
 
 @Component({
   selector: 'app-test-host',
