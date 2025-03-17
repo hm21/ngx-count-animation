@@ -103,6 +103,14 @@ export const appConfig: ApplicationConfig = {
 <div ngxCountAnimation="123456789" duration="2000" maximumFractionDigits="0" minimumFractionDigits="0" enableLayoutChangeDetection="true"></div>
 ```
 
+
+## Sponsors 
+<p align="center">
+  <a href="https://github.com/sponsors/hm21">
+    <img src='https://raw.githubusercontent.com/hm21/sponsors/main/sponsorkit/sponsors.svg'/>
+  </a>
+</p>
+
 ## Contributing
 
 I welcome contributions from the open-source community to make this project even better. Whether you want to report a bug, suggest a new feature, or contribute code, I appreciate your help.
